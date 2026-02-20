@@ -1,0 +1,4 @@
+database_url = "host=localhost dbname=grpc_auth user=user password=password sslmode=disable"
+test_database_url = "host=localhost dbname=grpc_auth_test user=user password=password sslmode=disable"
+bind_addr = ":8080"
+log_level = "DEBUG"
