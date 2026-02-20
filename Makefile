@@ -5,3 +5,7 @@ build:
 .PHONY: lint
 lint:
 	golangci-lint run ./...
+
+.PHONY: migrate
+migrate-up:
+	migrate -path migrations -database "$(DB_DSN)" up
