@@ -1,3 +1,7 @@
 .PHONY: build
-build-auth:
+build:
 	go build -v ./cmd/app
+
+.PHONY: lint
+lint:
+	golangci-lint run ./...
