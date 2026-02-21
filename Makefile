@@ -10,12 +10,6 @@ start:
 lint:
 	golangci-lint run ./...
 
-.PHONY: migrate
-migrate-up:
-	migrate -path migrations -database "$(DB_DSN)" up
-migrate-down:
-	migrate -path migrations -database "$(DB_DSN)" down
-
 .PHONY: gofmt
 gofmt:
 	gofmt -w -s .

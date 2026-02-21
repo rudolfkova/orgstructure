@@ -53,6 +53,6 @@ func (h *EmployeeHandler) HandleCreateEmployeeInDepartment() http.HandlerFunc {
 			return
 		}
 
-		h.server.Respond(w, r, http.StatusCreated, emp)
+		h.server.Respond(w, r, http.StatusCreated, emp.ToDTO())
 	}
 }
