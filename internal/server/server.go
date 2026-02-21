@@ -12,8 +12,18 @@ import (
 var (
 	// ErrEmployeeNotFound ...
 	ErrEmployeeNotFound = errors.New("employee not found")
-	// ErrDuplicateEmail ...
-	ErrDuplicateEmail = errors.New("employee with this email already exists")
+	// ErrDuplicateName ...
+	ErrDuplicateName = errors.New("employee with this name already exists")
+	// ErrInvalidDepth ...
+	ErrInvalidDepth = errors.New("invalid depth")
+	// ErrInvalidIncludeEmployees ...
+	ErrInvalidIncludeEmployees = errors.New("invalid include_employees")
+	// ErrInvalidID ...
+	ErrInvalidID = errors.New("invalid id")
+	// ErrInvalidMode ...
+	ErrInvalidMode = errors.New("invalid mode")
+	// ErrInvalidReassignToDepartmentID ...
+	ErrInvalidReassignToDepartmentID = errors.New("invalid reassign_to_department_id")
 )
 
 // Server ...
@@ -64,11 +74,41 @@ func (s *Server) Error(w http.ResponseWriter, r *http.Request, op string, err er
 			Message: "Department not found",
 		}
 
-	case errors.Is(err, ErrDuplicateEmail):
+	case errors.Is(err, ErrDuplicateName):
 		code = http.StatusConflict
 		resp = ErrorResponse{
 			Code:    "EMPLOYEE_ALREADY_EXISTS",
 			Message: "Employee with this email already exists",
+		}
+	case errors.Is(err, ErrInvalidDepth):
+		code = http.StatusBadRequest
+		resp = ErrorResponse{
+			Code:    "INVALID_INPUT_DATA",
+			Message: "Invalid depth",
+		}
+	case errors.Is(err, ErrInvalidIncludeEmployees):
+		code = http.StatusBadRequest
+		resp = ErrorResponse{
+			Code:    "INVALID_INPUT_DATA",
+			Message: "Invalid include employees",
+		}
+	case errors.Is(err, ErrInvalidID):
+		code = http.StatusBadRequest
+		resp = ErrorResponse{
+			Code:    "INVALID_INPUT_DATA",
+			Message: "Invalid ID",
+		}
+	case errors.Is(err, ErrInvalidMode):
+		code = http.StatusBadRequest
+		resp = ErrorResponse{
+			Code:    "INVALID_INPUT_DATA",
+			Message: "Invalid mode",
+		}
+	case errors.Is(err, ErrInvalidReassignToDepartmentID):
+		code = http.StatusBadRequest
+		resp = ErrorResponse{
+			Code:    "INVALID_INPUT_DATA",
+			Message: "Invalid reassign to department id",
 		}
 
 	default:

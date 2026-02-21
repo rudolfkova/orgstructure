@@ -4,40 +4,48 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"orgstructure/internal/repository"
 	orgserver "orgstructure/internal/server"
+	"orgstructure/internal/service"
+	"strconv"
 	"time"
 )
 
 // EmployeeHandler ...
 type EmployeeHandler struct {
-	empRepo repository.EmployeeRepository
+	service service.EmployeeService
+	server  *orgserver.Server
 }
 
 // HandleCreateEmployeeInDepartment ...
-func (h *EmployeeHandler) HandleCreateEmployeeInDepartment(s *orgserver.Server) http.HandlerFunc {
+func (h *EmployeeHandler) HandleCreateEmployeeInDepartment() http.HandlerFunc {
 	const op = "EmployeeHandler.handleCreateEmployeeInDepartment"
 
 	type request struct {
-		Name     string    `json:"name"`
-		Position string    `json:"position"`
-		HiredAt  time.Time `json:"hired_at"`
+		Name     string     `json:"name"`
+		Position string     `json:"position"`
+		HiredAt  *time.Time `json:"hired_at"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.PathValue("id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			h.server.Error(w, r, op, orgserver.ErrInvalidID)
+			return
+		}
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			s.Error(w, r, op, err)
+			h.server.Error(w, r, op, err)
 			return
 		}
 
 		ctx := r.Context()
 
-		emp, err := h.empRepo.CreateEmployeeInDepartment(&ctx, req.Name, req.Position, req.HiredAt)
+		emp, err := h.service.CreateEmployeeInDepartment(&ctx, req.Name, req.Position, req.HiredAt, id)
 		if err != nil {
-			s.Error(w, r, op, err)
+			h.server.Error(w, r, op, err)
 			return
 		}
 
-		s.Respond(w, r, http.StatusCreated, emp)
+		h.server.Respond(w, r, http.StatusCreated, emp)
 	}
 }
