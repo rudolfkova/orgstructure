@@ -3,10 +3,11 @@ module orgstructure
 go 1.25.4
 
 require (
-	github.com/BurntSushi/toml v1.6.0
 	github.com/google/uuid v1.6.0
+	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.11.2
 	github.com/pressly/goose/v3 v3.26.0
+	github.com/sethvargo/go-envconfig v1.3.0
 	github.com/stretchr/testify v1.11.1
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.1

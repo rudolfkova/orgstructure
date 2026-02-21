@@ -1,18 +1,32 @@
-// Package config ...
 package config
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"os"
+
+	"github.com/joho/godotenv"
+	"github.com/sethvargo/go-envconfig"
+)
 
 // Config ...
 type Config struct {
-	DatabaseURL     string `toml:"database_url"`
-	TestDatabaseURL string `toml:"test_database_url"`
-	BindAddr        string `toml:"bind_addr"`
-	LogLevel        string `toml:"log_level"`
+	DatabaseURL string `env:"DATABASE_URL,required"`
+	BindAddr    string `env:"BIND_ADDR,default=:8080"`
+	LogLevel    string `env:"LOG_LEVEL,default=info"`
 }
 
-// NewConfig ...
-func NewConfig() *Config {
-	return &Config{
-		BindAddr: ":8080",
-		LogLevel: "info",
+// ParseConfig загружает .env файл (если есть) и парсит переменные окружения.
+func ParseConfig() (Config, error) {
+	if err := godotenv.Load(".env"); err != nil && !errors.Is(err, os.ErrNotExist) {
+		return Config{}, fmt.Errorf("load env variables from file: %w", err)
 	}
+
+	var c Config
+	if err := envconfig.Process(context.Background(), &c); err != nil {
+		return Config{}, fmt.Errorf("parse env variables to config: %w", err)
+	}
+
+	return c, nil
 }

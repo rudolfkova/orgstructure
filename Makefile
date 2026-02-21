@@ -1,10 +1,12 @@
 .PHONY: build
 build:
 	go build -v ./cmd/app
+docker-build:
+	docker-compose up --build
 
 .PHONY: start
 start:
-	./app.exe -config-path=config.toml
+	./app.exe
 
 .PHONY: lint
 lint:

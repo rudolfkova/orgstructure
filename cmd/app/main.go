@@ -4,7 +4,6 @@ package main
 import (
 	"context"
 	"errors"
-	"flag"
 	"log"
 	"log/slog"
 	"net/http"
@@ -19,27 +18,14 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
-	"github.com/BurntSushi/toml"
 )
-
-var (
-	configPath string
-)
-
-func init() {
-	flag.StringVar(&configPath, "config-path", "config.toml", "path to config file")
-}
 
 func main() {
-	flag.Parse()
-
-	cfg := config.NewConfig()
-	_, err := toml.DecodeFile(configPath, cfg)
+	cfg, err := config.ParseConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
-	logger := config.NewLogger(cfg)
+	logger := config.NewLogger(&cfg)
 
 	db, err := gormdb.NewPostgresDB(cfg.DatabaseURL)
 	if err != nil {
