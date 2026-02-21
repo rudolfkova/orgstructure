@@ -13,7 +13,12 @@ import (
 // Server ...
 type Server struct {
 	// router *http.ServeMux
-	logger *slog.Logger
+	Logger *slog.Logger
+}
+
+// NewServer ...
+func NewServer(logger *slog.Logger) *Server {
+	return &Server{Logger: logger}
 }
 
 // ErrorResponse ...
@@ -31,7 +36,7 @@ func (s *Server) Respond(w http.ResponseWriter, r *http.Request, code int, data 
 	if data != nil {
 		err := json.NewEncoder(w).Encode(data)
 		if err != nil {
-			log := s.logger.With(
+			log := s.Logger.With(
 				slog.String("op:", op),
 				slog.String("requestID:", middleware.GetRequestIDFromRequest(r)),
 			)
@@ -43,7 +48,7 @@ func (s *Server) Respond(w http.ResponseWriter, r *http.Request, code int, data 
 // Error ...
 func (s *Server) Error(w http.ResponseWriter, r *http.Request, op string, err error) {
 	var resp ErrorResponse
-	log := s.logger.With(
+	log := s.Logger.With(
 		slog.String("op", op),
 		slog.String("requestID:", middleware.GetRequestIDFromRequest(r)),
 	)

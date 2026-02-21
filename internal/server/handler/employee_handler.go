@@ -17,6 +17,11 @@ type EmployeeHandler struct {
 	server  *orgserver.Server
 }
 
+// NewEmployeeHandler ...
+func NewEmployeeHandler(svc service.EmployeeService, srv *orgserver.Server) *EmployeeHandler {
+	return &EmployeeHandler{service: svc, server: srv}
+}
+
 // HandleCreateEmployeeInDepartment ...
 func (h *EmployeeHandler) HandleCreateEmployeeInDepartment() http.HandlerFunc {
 	const op = "EmployeeHandler.handleCreateEmployeeInDepartment"

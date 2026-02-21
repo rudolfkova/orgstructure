@@ -25,3 +25,21 @@ type DepartmentTree struct {
 	Employees []EmployeeDTO    `json:"employees,omitempty"`
 	Children  []DepartmentTree `json:"children,omitempty"`
 }
+
+// DepartmentDTO ...
+type DepartmentDTO struct {
+	ID        uint      `json:"id"`
+	Name      string    `json:"name"`
+	ParentID  *uint     `json:"parent_id"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+// ToDTO ...
+func (d *Department) ToDTO() DepartmentDTO {
+	return DepartmentDTO{
+		ID:        d.ID,
+		Name:      d.Name,
+		ParentID:  d.ParentID,
+		CreatedAt: d.CreatedAt,
+	}
+}

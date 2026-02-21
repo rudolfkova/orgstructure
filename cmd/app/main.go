@@ -2,10 +2,23 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"flag"
 	"log"
 	"log/slog"
+	"net/http"
 	"orgstructure/internal/config"
+	gormdb "orgstructure/internal/infrastructure/gorm"
+	gormrepo "orgstructure/internal/infrastructure/gorm/repository"
+	orgserver "orgstructure/internal/server"
+	"orgstructure/internal/server/handler"
+	"orgstructure/internal/server/middleware"
+	"orgstructure/internal/usecase"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/BurntSushi/toml"
 )
@@ -19,18 +32,68 @@ func init() {
 }
 
 func main() {
+	flag.Parse()
+
 	cfg := config.NewConfig()
 	_, err := toml.DecodeFile(configPath, cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 	logger := config.NewLogger(cfg)
-	log := logger.With(
-		slog.String("BindAddr:", cfg.BindAddr),
-		slog.String("DatabaseURL:", cfg.DatabaseURL),
-		slog.String("LogLevel:", cfg.LogLevel),
-		slog.String("TestDatabaseURL:", cfg.TestDatabaseURL),
-	)
-	log.Info("init")
+
+	db, err := gormdb.NewPostgresDB(cfg.DatabaseURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	deptRepo := gormrepo.NewDepartmentRepository(db)
+	empRepo := gormrepo.NewEmployeeRepository(db)
+
+	deptService := usecase.NewDepartmentService(deptRepo)
+	empService := usecase.NewEmployeeService(empRepo, deptRepo)
+
+	srv := orgserver.NewServer(logger)
+	deptHandler := handler.NewDepartmentHandler(deptService, srv)
+	empHandler := handler.NewEmployeeHandler(empService, srv)
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("POST /departments/", deptHandler.HandleCreateDepartment())
+	mux.HandleFunc("GET /departments/{id}", deptHandler.HandleGetDepartment())
+	mux.HandleFunc("PATCH /departments/{id}", deptHandler.HandleUpdateDepartment())
+	mux.HandleFunc("DELETE /departments/{id}", deptHandler.HandleDelDepartment())
+	mux.HandleFunc("POST /departments/{id}/employees/", empHandler.HandleCreateEmployeeInDepartment())
+
+	middleware.Use(middleware.RequestID)
+	wrappedMux := middleware.Apply(mux)
+
+	httpServer := &http.Server{
+		Addr:         cfg.BindAddr,
+		Handler:      wrappedMux,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		logger.Info("starting server", slog.String("addr", cfg.BindAddr))
+		if err := httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatal(err)
+		}
+	}()
+
+	<-quit
+	logger.Info("shutting down server...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := httpServer.Shutdown(ctx); err != nil {
+		log.Fatalf("server forced to shutdown: %v", err)
+	}
+
+	logger.Info("server stopped")
 
 }

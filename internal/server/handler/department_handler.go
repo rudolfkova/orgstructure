@@ -3,9 +3,11 @@ package handler
 
 import (
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	orgerror "orgstructure/internal/errors"
 	orgserver "orgstructure/internal/server"
+	"orgstructure/internal/server/middleware"
 	"orgstructure/internal/service"
 	"strconv"
 	"strings"
@@ -15,6 +17,11 @@ import (
 type DepartmentHandler struct {
 	service service.DepartmentService
 	server  *orgserver.Server
+}
+
+// NewDepartmentHandler ...
+func NewDepartmentHandler(svc service.DepartmentService, srv *orgserver.Server) *DepartmentHandler {
+	return &DepartmentHandler{service: svc, server: srv}
 }
 
 func isMode(str string) bool {
@@ -30,6 +37,12 @@ func (h *DepartmentHandler) HandleCreateDepartment() http.HandlerFunc {
 		ParentID       *int   `json:"parent_id"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
+		log := h.server.Logger.With(
+			slog.String("op", op),
+			slog.String("requestID:", middleware.GetRequestIDFromRequest(r)),
+		)
+
+		log.Info("create department")
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			h.server.Error(w, r, op, err)
@@ -59,7 +72,7 @@ func (h *DepartmentHandler) HandleCreateDepartment() http.HandlerFunc {
 			return
 		}
 
-		h.server.Respond(w, r, http.StatusCreated, dept)
+		h.server.Respond(w, r, http.StatusCreated, dept.ToDTO())
 	}
 }
 
@@ -68,6 +81,12 @@ func (h *DepartmentHandler) HandleGetDepartment() http.HandlerFunc {
 	const op = "EmployeeHandler.HandleGetDepartment"
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		log := h.server.Logger.With(
+			slog.String("op", op),
+			slog.String("requestID:", middleware.GetRequestIDFromRequest(r)),
+		)
+		log.Info("get department")
+
 		idStr := r.PathValue("id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil || id < 0 {
@@ -121,6 +140,12 @@ func (h *DepartmentHandler) HandleUpdateDepartment() http.HandlerFunc {
 		ParentID       *int    `json:"parent_id"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
+		log := h.server.Logger.With(
+			slog.String("op", op),
+			slog.String("requestID:", middleware.GetRequestIDFromRequest(r)),
+		)
+		log.Info("update department")
+
 		idStr := r.PathValue("id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil || id < 0 {
@@ -151,7 +176,7 @@ func (h *DepartmentHandler) HandleUpdateDepartment() http.HandlerFunc {
 			return
 		}
 
-		h.server.Respond(w, r, http.StatusOK, dept)
+		h.server.Respond(w, r, http.StatusOK, dept.ToDTO())
 	}
 }
 
@@ -160,6 +185,12 @@ func (h *DepartmentHandler) HandleDelDepartment() http.HandlerFunc {
 	const op = "EmployeeHandler.HandleDelDepartment"
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		log := h.server.Logger.With(
+			slog.String("op", op),
+			slog.String("requestID:", middleware.GetRequestIDFromRequest(r)),
+		)
+		log.Info("delete department")
+
 		idStr := r.PathValue("id")
 
 		id, err := strconv.Atoi(idStr)

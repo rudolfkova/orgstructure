@@ -25,3 +25,14 @@ type EmployeeDTO struct {
 	HiredAt   *time.Time `json:"hired_at,omitempty"`
 	CreatedAt time.Time  `json:"created_at"`
 }
+
+// ToDTO ...
+func (e *Employee) ToDTO() EmployeeDTO {
+	return EmployeeDTO{
+		ID:        e.ID,
+		FullName:  e.FullName,
+		Position:  e.Position,
+		HiredAt:   e.HiredAt,
+		CreatedAt: e.CreatedAt,
+	}
+}
