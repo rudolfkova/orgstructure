@@ -8,8 +8,8 @@ import (
 
 // DepartmentService ...
 type DepartmentService interface {
-	CreateDepartment(ctx context.Context, departmentName string, pareintID *int) (department model.Department, err error)
-	GetDepartment(ctx context.Context, treeDepth int, includEmployees bool, deportmentID int) (department *model.Department, err error)
-	UpdateDepartment(ctx context.Context, departmentName *string, pareintID *int, departmentID int) (department *model.Department, err error)
-	DelDepartment(ctx context.Context, mode string, reassignToDepartmentID *int, departmentID int) error
+	CreateDepartment(ctx context.Context, name string, parentID *uint) (*model.Department, error)
+	GetDepartment(ctx context.Context, depth int, includeEmployees bool, id uint) (*model.DepartmentTree, error)
+	UpdateDepartment(ctx context.Context, id uint, name *string, parentID *uint) (*model.Department, error)
+	DelDepartment(ctx context.Context, id uint, mode string, reassignToDepartmentID *uint) error
 }

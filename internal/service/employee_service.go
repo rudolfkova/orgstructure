@@ -9,5 +9,5 @@ import (
 
 // EmployeeService ...
 type EmployeeService interface {
-	CreateEmployeeInDepartment(ctx *context.Context, employeeFullName string, position string, hiredAt *time.Time, id int) (employee model.Employee, err error)
+	CreateEmployeeInDepartment(ctx context.Context, departmentID uint, fullName, position string, hiredAt *time.Time) (*model.Employee, error)
 }

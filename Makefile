@@ -13,3 +13,8 @@ migrate-up:
 .PHONY: gofmt
 gofmt:
 	gofmt -w -s .
+
+.PHONY mock
+mock:
+	mockery --name=DepartmentRepository --dir=./internal/repository --output=./mocks/repository --outpkg=mocks
+	mockery --name=EmployeeRepository --dir=./internal/repository --output=./mocks/repository --outpkg=mocks

@@ -3,7 +3,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	orgerror "orgstructure/internal/errors"
 	orgserver "orgstructure/internal/server"
@@ -43,13 +42,23 @@ func (h *DepartmentHandler) HandleCreateDepartment() http.HandlerFunc {
 		}
 
 		if strings.TrimSpace(req.DepartmentName) == "" {
-			h.server.Error(w, r, op, fmt.Errorf("invalid department_name"))
+			h.server.Error(w, r, op, orgerror.ErrInvalidDepartmentName)
 			return
+		}
+
+		var parentIDPtr *uint
+		if req.ParentID != nil {
+			if *req.ParentID < 0 {
+				h.server.Error(w, r, op, orgerror.ErrInvalidID)
+				return
+			}
+			parentIDVal := uint(*req.ParentID)
+			parentIDPtr = &parentIDVal
 		}
 
 		ctx := r.Context()
 
-		dept, err := h.service.CreateDepartment(ctx, req.DepartmentName, req.ParentID)
+		dept, err := h.service.CreateDepartment(ctx, req.DepartmentName, parentIDPtr)
 		if err != nil {
 			h.server.Error(w, r, op, err)
 			return
@@ -66,8 +75,8 @@ func (h *DepartmentHandler) HandleGetDepartment() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")
 		id, err := strconv.Atoi(idStr)
-		if err != nil {
-			h.server.Error(w, r, op, fmt.Errorf("invalid id"))
+		if err != nil || id < 0 {
+			h.server.Error(w, r, op, orgerror.ErrInvalidID)
 			return
 		}
 		depthStr := r.URL.Query().Get("depth")
@@ -83,7 +92,7 @@ func (h *DepartmentHandler) HandleGetDepartment() http.HandlerFunc {
 			depth = parsed
 		}
 		if depth < 0 {
-			h.server.Error(w, r, op, fmt.Errorf("invalid depth"))
+			h.server.Error(w, r, op, orgerror.ErrInvalidDepth)
 		}
 
 		includeEmployees := true // default
@@ -98,13 +107,13 @@ func (h *DepartmentHandler) HandleGetDepartment() http.HandlerFunc {
 
 		ctx := r.Context()
 
-		dept, err := h.service.GetDepartment(ctx, depth, includeEmployees, id)
+		tree, err := h.service.GetDepartment(ctx, depth, includeEmployees, uint(id))
 		if err != nil {
 			h.server.Error(w, r, op, err)
 			return
 		}
 
-		h.server.Respond(w, r, http.StatusOK, dept)
+		h.server.Respond(w, r, http.StatusOK, tree)
 	}
 }
 
@@ -119,7 +128,7 @@ func (h *DepartmentHandler) HandleUpdateDepartment() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")
 		id, err := strconv.Atoi(idStr)
-		if err != nil {
+		if err != nil || id < 0 {
 			h.server.Error(w, r, op, orgerror.ErrInvalidID)
 			return
 		}
@@ -129,9 +138,19 @@ func (h *DepartmentHandler) HandleUpdateDepartment() http.HandlerFunc {
 			return
 		}
 
+		var parentIDPtr *uint
+		if req.ParentID != nil {
+			if *req.ParentID < 0 {
+				h.server.Error(w, r, op, orgerror.ErrInvalidID)
+				return
+			}
+			parentIDVal := uint(*req.ParentID)
+			parentIDPtr = &parentIDVal
+		}
+
 		ctx := r.Context()
 
-		dept, err := h.service.UpdateDepartment(ctx, req.DepartmentName, req.ParentID, id)
+		dept, err := h.service.UpdateDepartment(ctx, uint(id), req.DepartmentName, parentIDPtr)
 		if err != nil {
 			h.server.Error(w, r, op, err)
 			return
@@ -149,7 +168,7 @@ func (h *DepartmentHandler) HandleDelDepartment() http.HandlerFunc {
 		idStr := r.PathValue("id")
 
 		id, err := strconv.Atoi(idStr)
-		if err != nil {
+		if err != nil || id < 0 {
 			h.server.Error(w, r, op, orgerror.ErrInvalidID)
 			return
 		}
@@ -162,24 +181,25 @@ func (h *DepartmentHandler) HandleDelDepartment() http.HandlerFunc {
 		}
 
 		reassignToDepartmentIDstr := r.URL.Query().Get("reassign_to_department_id")
-		var reassignToDepartmentID *int
+		var reassignToDepartmentIDPtr *uint
 		if reassignToDepartmentIDstr != "" {
 			parsed, err := strconv.Atoi(reassignToDepartmentIDstr)
-			if err != nil {
+			if err != nil || parsed < 0 {
 				h.server.Error(w, r, op, orgerror.ErrInvalidReassignToDepartmentID)
 				return
 			}
-			reassignToDepartmentID = &parsed
+			reassignToDepartmentIDVal := uint(parsed)
+			reassignToDepartmentIDPtr = &reassignToDepartmentIDVal
 		}
 
-		if mode == reassignMode && reassignToDepartmentID == nil {
+		if mode == reassignMode && reassignToDepartmentIDPtr == nil {
 			h.server.Error(w, r, op, orgerror.ErrInvalidReassignToDepartmentID)
 			return
 		}
 
 		ctx := r.Context()
 
-		err = h.service.DelDepartment(ctx, mode, reassignToDepartmentID, id)
+		err = h.service.DelDepartment(ctx, uint(id), mode, reassignToDepartmentIDPtr)
 		if err != nil {
 			h.server.Error(w, r, op, err)
 			return

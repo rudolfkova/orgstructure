@@ -51,48 +51,39 @@ func (s *Server) Error(w http.ResponseWriter, r *http.Request, op string, err er
 
 	var code int
 	switch {
-	case errors.Is(err, orgerror.ErrEmployeeNotFound):
+	case errors.Is(err, orgerror.ErrDepartmentNotFound), errors.Is(err, orgerror.ErrEmployeeNotFound), errors.Is(err, orgerror.ErrParentNotFound):
 		code = http.StatusNotFound
 		resp = ErrorResponse{
-			Code:    "DEPARTMENT_NOT_FOUND",
-			Message: "Department not found",
+			Code:    "NOT_FOUND",
+			Message: err.Error(),
 		}
 
 	case errors.Is(err, orgerror.ErrDuplicateName):
 		code = http.StatusConflict
 		resp = ErrorResponse{
-			Code:    "EMPLOYEE_ALREADY_EXISTS",
-			Message: "Employee with this email already exists",
+			Code:    "DUPLICATE_NAME",
+			Message: err.Error(),
 		}
-	case errors.Is(err, orgerror.ErrInvalidDepth):
+
+	case errors.Is(err, orgerror.ErrCyclicDependency):
+		code = http.StatusConflict
+		resp = ErrorResponse{
+			Code:    "CYCLIC_DEPENDENCY",
+			Message: err.Error(),
+		}
+
+	case errors.Is(err, orgerror.ErrInvalidDepartmentName),
+		errors.Is(err, orgerror.ErrInvalidFullName),
+		errors.Is(err, orgerror.ErrInvalidPosition),
+		errors.Is(err, orgerror.ErrInvalidDepth),
+		errors.Is(err, orgerror.ErrInvalidIncludeEmployees),
+		errors.Is(err, orgerror.ErrInvalidID),
+		errors.Is(err, orgerror.ErrInvalidMode),
+		errors.Is(err, orgerror.ErrInvalidReassignToDepartmentID):
 		code = http.StatusBadRequest
 		resp = ErrorResponse{
-			Code:    "INVALID_INPUT_DATA",
-			Message: "Invalid depth",
-		}
-	case errors.Is(err, orgerror.ErrInvalidIncludeEmployees):
-		code = http.StatusBadRequest
-		resp = ErrorResponse{
-			Code:    "INVALID_INPUT_DATA",
-			Message: "Invalid include employees",
-		}
-	case errors.Is(err, orgerror.ErrInvalidID):
-		code = http.StatusBadRequest
-		resp = ErrorResponse{
-			Code:    "INVALID_INPUT_DATA",
-			Message: "Invalid ID",
-		}
-	case errors.Is(err, orgerror.ErrInvalidMode):
-		code = http.StatusBadRequest
-		resp = ErrorResponse{
-			Code:    "INVALID_INPUT_DATA",
-			Message: "Invalid mode",
-		}
-	case errors.Is(err, orgerror.ErrInvalidReassignToDepartmentID):
-		code = http.StatusBadRequest
-		resp = ErrorResponse{
-			Code:    "INVALID_INPUT_DATA",
-			Message: "Invalid reassign to department id",
+			Code:    "INVALID_INPUT",
+			Message: err.Error(),
 		}
 
 	default:

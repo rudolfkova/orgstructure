@@ -9,10 +9,19 @@ type Department struct {
 	Name string `gorm:"size:200;not null"`
 
 	ParentID *uint
-	Parent   *Department `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Parent   *Department  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Children []Department `gorm:"foreignKey:ParentID"`
 
 	Employees []Employee `gorm:"constraint:OnDelete:RESTRICT;"`
 
 	CreatedAt time.Time `gorm:"not null;default:now()"`
+}
+
+// DepartmentTree ...
+type DepartmentTree struct {
+	ID        uint             `json:"id"`
+	Name      string           `json:"name"`
+	CreatedAt time.Time        `json:"created_at"`
+	Employees []EmployeeDTO    `json:"employees,omitempty"`
+	Children  []DepartmentTree `json:"children,omitempty"`
 }

@@ -16,3 +16,12 @@ type Employee struct {
 
 	CreatedAt time.Time `gorm:"not null;default:now()"`
 }
+
+// EmployeeDTO ...
+type EmployeeDTO struct {
+	ID        uint       `json:"id"`
+	FullName  string     `json:"full_name"`
+	Position  string     `json:"position"`
+	HiredAt   *time.Time `json:"hired_at,omitempty"`
+	CreatedAt time.Time  `json:"created_at"`
+}

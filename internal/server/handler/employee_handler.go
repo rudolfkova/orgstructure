@@ -22,17 +22,18 @@ func (h *EmployeeHandler) HandleCreateEmployeeInDepartment() http.HandlerFunc {
 	const op = "EmployeeHandler.handleCreateEmployeeInDepartment"
 
 	type request struct {
-		Name     string     `json:"name"`
+		Name     string     `json:"full_name"`
 		Position string     `json:"position"`
 		HiredAt  *time.Time `json:"hired_at"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")
 		id, err := strconv.Atoi(idStr)
-		if err != nil {
+		if err != nil || id < 0 {
 			h.server.Error(w, r, op, orgerror.ErrInvalidID)
 			return
 		}
+
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			h.server.Error(w, r, op, err)
@@ -41,7 +42,7 @@ func (h *EmployeeHandler) HandleCreateEmployeeInDepartment() http.HandlerFunc {
 
 		ctx := r.Context()
 
-		emp, err := h.service.CreateEmployeeInDepartment(&ctx, req.Name, req.Position, req.HiredAt, id)
+		emp, err := h.service.CreateEmployeeInDepartment(ctx, uint(id), req.Name, req.Position, req.HiredAt)
 		if err != nil {
 			h.server.Error(w, r, op, err)
 			return
