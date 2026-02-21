@@ -17,13 +17,8 @@ type DepartmentHandler struct {
 	server  *orgserver.Server
 }
 
-var (
-	cascadeMode  = "cascade"
-	reassignMode = "reassign"
-)
-
 func isMode(str string) bool {
-	return str == cascadeMode || str == reassignMode
+	return str == service.CascadeMode || str == service.ReassignMode
 }
 
 // HandleCreateDepartment ...
@@ -192,7 +187,7 @@ func (h *DepartmentHandler) HandleDelDepartment() http.HandlerFunc {
 			reassignToDepartmentIDPtr = &reassignToDepartmentIDVal
 		}
 
-		if mode == reassignMode && reassignToDepartmentIDPtr == nil {
+		if mode == service.ReassignMode && reassignToDepartmentIDPtr == nil {
 			h.server.Error(w, r, op, orgerror.ErrInvalidReassignToDepartmentID)
 			return
 		}

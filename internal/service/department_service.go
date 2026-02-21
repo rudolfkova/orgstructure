@@ -6,6 +6,13 @@ import (
 	"orgstructure/internal/model"
 )
 
+var (
+	// CascadeMode ...
+	CascadeMode = "cascade"
+	// ReassignMode ...
+	ReassignMode = "reassign"
+)
+
 // DepartmentService ...
 type DepartmentService interface {
 	CreateDepartment(ctx context.Context, name string, parentID *uint) (*model.Department, error)
