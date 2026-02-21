@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	orgerror "orgstructure/internal/errors"
 	orgserver "orgstructure/internal/server"
 	"orgstructure/internal/service"
 	"strconv"
@@ -76,7 +77,7 @@ func (h *DepartmentHandler) HandleGetDepartment() http.HandlerFunc {
 		if depthStr != "" {
 			parsed, err := strconv.Atoi(depthStr)
 			if err != nil {
-				h.server.Error(w, r, op, orgserver.ErrInvalidDepth)
+				h.server.Error(w, r, op, orgerror.ErrInvalidDepth)
 				return
 			}
 			depth = parsed
@@ -89,7 +90,7 @@ func (h *DepartmentHandler) HandleGetDepartment() http.HandlerFunc {
 		if includeStr != "" {
 			parsed, err := strconv.ParseBool(includeStr)
 			if err != nil {
-				h.server.Error(w, r, op, orgserver.ErrInvalidIncludeEmployees)
+				h.server.Error(w, r, op, orgerror.ErrInvalidIncludeEmployees)
 				return
 			}
 			includeEmployees = parsed
@@ -119,7 +120,7 @@ func (h *DepartmentHandler) HandleUpdateDepartment() http.HandlerFunc {
 		idStr := r.PathValue("id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			h.server.Error(w, r, op, orgserver.ErrInvalidID)
+			h.server.Error(w, r, op, orgerror.ErrInvalidID)
 			return
 		}
 		req := &request{}
@@ -149,14 +150,14 @@ func (h *DepartmentHandler) HandleDelDepartment() http.HandlerFunc {
 
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			h.server.Error(w, r, op, orgserver.ErrInvalidID)
+			h.server.Error(w, r, op, orgerror.ErrInvalidID)
 			return
 		}
 
 		mode := r.URL.Query().Get("mode")
 
 		if !isMode(mode) {
-			h.server.Error(w, r, op, orgserver.ErrInvalidMode)
+			h.server.Error(w, r, op, orgerror.ErrInvalidMode)
 			return
 		}
 
@@ -165,14 +166,14 @@ func (h *DepartmentHandler) HandleDelDepartment() http.HandlerFunc {
 		if reassignToDepartmentIDstr != "" {
 			parsed, err := strconv.Atoi(reassignToDepartmentIDstr)
 			if err != nil {
-				h.server.Error(w, r, op, orgserver.ErrInvalidReassignToDepartmentID)
+				h.server.Error(w, r, op, orgerror.ErrInvalidReassignToDepartmentID)
 				return
 			}
 			reassignToDepartmentID = &parsed
 		}
 
 		if mode == reassignMode && reassignToDepartmentID == nil {
-			h.server.Error(w, r, op, orgserver.ErrInvalidReassignToDepartmentID)
+			h.server.Error(w, r, op, orgerror.ErrInvalidReassignToDepartmentID)
 			return
 		}
 

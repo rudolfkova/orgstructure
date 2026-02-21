@@ -6,24 +6,8 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	orgerror "orgstructure/internal/errors"
 	"orgstructure/internal/server/middleware"
-)
-
-var (
-	// ErrEmployeeNotFound ...
-	ErrEmployeeNotFound = errors.New("employee not found")
-	// ErrDuplicateName ...
-	ErrDuplicateName = errors.New("employee with this name already exists")
-	// ErrInvalidDepth ...
-	ErrInvalidDepth = errors.New("invalid depth")
-	// ErrInvalidIncludeEmployees ...
-	ErrInvalidIncludeEmployees = errors.New("invalid include_employees")
-	// ErrInvalidID ...
-	ErrInvalidID = errors.New("invalid id")
-	// ErrInvalidMode ...
-	ErrInvalidMode = errors.New("invalid mode")
-	// ErrInvalidReassignToDepartmentID ...
-	ErrInvalidReassignToDepartmentID = errors.New("invalid reassign_to_department_id")
 )
 
 // Server ...
@@ -67,44 +51,44 @@ func (s *Server) Error(w http.ResponseWriter, r *http.Request, op string, err er
 
 	var code int
 	switch {
-	case errors.Is(err, ErrEmployeeNotFound):
+	case errors.Is(err, orgerror.ErrEmployeeNotFound):
 		code = http.StatusNotFound
 		resp = ErrorResponse{
 			Code:    "DEPARTMENT_NOT_FOUND",
 			Message: "Department not found",
 		}
 
-	case errors.Is(err, ErrDuplicateName):
+	case errors.Is(err, orgerror.ErrDuplicateName):
 		code = http.StatusConflict
 		resp = ErrorResponse{
 			Code:    "EMPLOYEE_ALREADY_EXISTS",
 			Message: "Employee with this email already exists",
 		}
-	case errors.Is(err, ErrInvalidDepth):
+	case errors.Is(err, orgerror.ErrInvalidDepth):
 		code = http.StatusBadRequest
 		resp = ErrorResponse{
 			Code:    "INVALID_INPUT_DATA",
 			Message: "Invalid depth",
 		}
-	case errors.Is(err, ErrInvalidIncludeEmployees):
+	case errors.Is(err, orgerror.ErrInvalidIncludeEmployees):
 		code = http.StatusBadRequest
 		resp = ErrorResponse{
 			Code:    "INVALID_INPUT_DATA",
 			Message: "Invalid include employees",
 		}
-	case errors.Is(err, ErrInvalidID):
+	case errors.Is(err, orgerror.ErrInvalidID):
 		code = http.StatusBadRequest
 		resp = ErrorResponse{
 			Code:    "INVALID_INPUT_DATA",
 			Message: "Invalid ID",
 		}
-	case errors.Is(err, ErrInvalidMode):
+	case errors.Is(err, orgerror.ErrInvalidMode):
 		code = http.StatusBadRequest
 		resp = ErrorResponse{
 			Code:    "INVALID_INPUT_DATA",
 			Message: "Invalid mode",
 		}
-	case errors.Is(err, ErrInvalidReassignToDepartmentID):
+	case errors.Is(err, orgerror.ErrInvalidReassignToDepartmentID):
 		code = http.StatusBadRequest
 		resp = ErrorResponse{
 			Code:    "INVALID_INPUT_DATA",

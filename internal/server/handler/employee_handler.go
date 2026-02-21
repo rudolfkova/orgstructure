@@ -4,6 +4,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	orgerror "orgstructure/internal/errors"
 	orgserver "orgstructure/internal/server"
 	"orgstructure/internal/service"
 	"strconv"
@@ -29,7 +30,7 @@ func (h *EmployeeHandler) HandleCreateEmployeeInDepartment() http.HandlerFunc {
 		idStr := r.PathValue("id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			h.server.Error(w, r, op, orgserver.ErrInvalidID)
+			h.server.Error(w, r, op, orgerror.ErrInvalidID)
 			return
 		}
 		req := &request{}
