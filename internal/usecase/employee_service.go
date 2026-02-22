@@ -5,6 +5,7 @@ import (
 	"context"
 	orgerror "orgstructure/internal/errors"
 	"orgstructure/internal/model"
+	"orgstructure/internal/validation"
 	"strings"
 	"time"
 )
@@ -23,12 +24,11 @@ func NewEmployeeService(empRepo EmployeeRepository, deptRepo DepartmentRepositor
 // CreateEmployeeInDepartment ...
 func (s *EmployeeService) CreateEmployeeInDepartment(ctx context.Context, departmentID uint, fullName, position string, hiredAt *time.Time) (*model.Employee, error) {
 	fullName = strings.TrimSpace(fullName)
-	if fullName == "" {
+	if err := validation.ValidateStr(fullName, 200); err != nil {
 		return nil, orgerror.ErrInvalidFullName
 	}
-
 	position = strings.TrimSpace(position)
-	if position == "" {
+	if err := validation.ValidateStr(position, 200); err != nil {
 		return nil, orgerror.ErrInvalidPosition
 	}
 

@@ -5,6 +5,8 @@ import (
 	"context"
 	orgerror "orgstructure/internal/errors"
 	"orgstructure/internal/model"
+	"orgstructure/internal/validation"
+	"strings"
 )
 
 const (
@@ -30,6 +32,11 @@ func NewDepartmentService(repo DepartmentRepository) *DepartmentService {
 
 // CreateDepartment ...
 func (s *DepartmentService) CreateDepartment(ctx context.Context, name string, parentID *uint) (*model.Department, error) {
+	name = strings.TrimSpace(name)
+	if err := validation.ValidateStr(name, 200); err != nil {
+		return nil, orgerror.ErrInvalidDepartmentName
+	}
+
 	if parentID != nil {
 		exists, err := s.deptRepo.Exists(ctx, *parentID)
 		if err != nil {
@@ -120,6 +127,15 @@ func (s *DepartmentService) buildTree(ctx context.Context, dept *model.Departmen
 
 // UpdateDepartment ...
 func (s *DepartmentService) UpdateDepartment(ctx context.Context, id uint, name *string, parentID *uint) (*model.Department, error) {
+	if name != nil {
+		nameVal := *name
+		nameVal = strings.TrimSpace(nameVal)
+		if err := validation.ValidateStr(nameVal, 200); err != nil {
+			return nil, orgerror.ErrInvalidDepartmentName
+		}
+		name = &nameVal
+	}
+
 	dept, err := s.deptRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, err

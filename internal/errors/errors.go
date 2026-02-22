@@ -32,6 +32,4 @@ var (
 	ErrCyclicDependency = errors.New("cyclic dependency detected")
 	// ErrReassignTargetInSubtree ...
 	ErrReassignTargetInSubtree = errors.New("reassign_to_department_id is within the deleted subtree")
-	// ErrValidationStrLen ...
-	ErrValidationStrLen = errors.New("invalid lenght of string")
 )

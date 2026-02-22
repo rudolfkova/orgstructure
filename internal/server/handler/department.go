@@ -10,9 +10,7 @@ import (
 	orgserver "orgstructure/internal/server"
 	"orgstructure/internal/server/middleware"
 	"orgstructure/internal/usecase"
-	"orgstructure/internal/validation"
 	"strconv"
-	"strings"
 )
 
 // DepartmentHandler ...
@@ -48,12 +46,6 @@ func (h *DepartmentHandler) HandleCreateDepartment() http.HandlerFunc {
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			h.server.Error(w, r, op, err)
-			return
-		}
-
-		req.DepartmentName = strings.TrimSpace(req.DepartmentName)
-		if err := validation.ValidateStr(req.DepartmentName, 200); err != nil {
-			h.server.Error(w, r, op, orgerror.ErrInvalidDepartmentName)
 			return
 		}
 
@@ -160,16 +152,6 @@ func (h *DepartmentHandler) HandleUpdateDepartment() http.HandlerFunc {
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			h.server.Error(w, r, op, err)
 			return
-		}
-
-		if req.DepartmentName != nil {
-			nameVal := *req.DepartmentName
-			nameVal = strings.TrimSpace(nameVal)
-			if err := validation.ValidateStr(nameVal, 200); err != nil {
-				h.server.Error(w, r, op, orgerror.ErrInvalidDepartmentName)
-				return
-			}
-			req.DepartmentName = &nameVal
 		}
 
 		var parentIDPtr *uint
