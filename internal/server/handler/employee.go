@@ -6,9 +6,11 @@ package handler
 
 import (
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	orgerror "orgstructure/internal/errors"
 	orgserver "orgstructure/internal/server"
+	"orgstructure/internal/server/middleware"
 	"strconv"
 	"time"
 )
@@ -34,6 +36,12 @@ func (h *EmployeeHandler) HandleCreateEmployeeInDepartment() http.HandlerFunc {
 		HiredAt  *time.Time `json:"hired_at"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
+		log := h.server.Logger.With(
+			slog.String("op", op),
+			slog.String("requestID", middleware.GetRequestIDFromRequest(r)),
+		)
+		log.Info("create employee")
+
 		idStr := r.PathValue("id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil || id < 0 {

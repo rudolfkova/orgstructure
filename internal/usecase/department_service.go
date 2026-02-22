@@ -3,7 +3,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	orgerror "orgstructure/internal/errors"
 	"orgstructure/internal/model"
 	"strings"
@@ -210,7 +209,7 @@ func (s *DepartmentService) DelDepartment(ctx context.Context, id uint, mode str
 		}
 		for _, subtreeID := range subtreeIDs {
 			if subtreeID == *reassignToDepartmentID {
-				return fmt.Errorf("reassign_to_department_id is within the deleted subtree")
+				return orgerror.ErrReassignTargetInSubtree
 			}
 		}
 

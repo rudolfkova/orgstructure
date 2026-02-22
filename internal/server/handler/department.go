@@ -30,7 +30,7 @@ func isMode(str string) bool {
 
 // HandleCreateDepartment ...
 func (h *DepartmentHandler) HandleCreateDepartment() http.HandlerFunc {
-	const op = "EmployeeHandler.HandleCreateDepartment"
+	const op = "DepartmentHandler.HandleCreateDepartment"
 
 	type request struct {
 		DepartmentName string `json:"name"`
@@ -39,7 +39,7 @@ func (h *DepartmentHandler) HandleCreateDepartment() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log := h.server.Logger.With(
 			slog.String("op", op),
-			slog.String("requestID:", middleware.GetRequestIDFromRequest(r)),
+			slog.String("requestID", middleware.GetRequestIDFromRequest(r)),
 		)
 
 		log.Info("create department")
@@ -83,7 +83,7 @@ func (h *DepartmentHandler) HandleGetDepartment() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log := h.server.Logger.With(
 			slog.String("op", op),
-			slog.String("requestID:", middleware.GetRequestIDFromRequest(r)),
+			slog.String("requestID", middleware.GetRequestIDFromRequest(r)),
 		)
 		log.Info("get department")
 
@@ -142,7 +142,7 @@ func (h *DepartmentHandler) HandleUpdateDepartment() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log := h.server.Logger.With(
 			slog.String("op", op),
-			slog.String("requestID:", middleware.GetRequestIDFromRequest(r)),
+			slog.String("requestID", middleware.GetRequestIDFromRequest(r)),
 		)
 		log.Info("update department")
 
@@ -187,7 +187,7 @@ func (h *DepartmentHandler) HandleDelDepartment() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log := h.server.Logger.With(
 			slog.String("op", op),
-			slog.String("requestID:", middleware.GetRequestIDFromRequest(r)),
+			slog.String("requestID", middleware.GetRequestIDFromRequest(r)),
 		)
 		log.Info("delete department")
 

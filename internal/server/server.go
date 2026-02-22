@@ -56,7 +56,9 @@ func (s *Server) Error(w http.ResponseWriter, r *http.Request, op string, err er
 
 	var code int
 	switch {
-	case errors.Is(err, orgerror.ErrDepartmentNotFound), errors.Is(err, orgerror.ErrEmployeeNotFound), errors.Is(err, orgerror.ErrParentNotFound):
+	case errors.Is(err, orgerror.ErrDepartmentNotFound),
+		errors.Is(err, orgerror.ErrEmployeeNotFound),
+		errors.Is(err, orgerror.ErrParentNotFound):
 		code = http.StatusNotFound
 		resp = ErrorResponse{
 			Code:    "NOT_FOUND",
@@ -84,6 +86,7 @@ func (s *Server) Error(w http.ResponseWriter, r *http.Request, op string, err er
 		errors.Is(err, orgerror.ErrInvalidIncludeEmployees),
 		errors.Is(err, orgerror.ErrInvalidID),
 		errors.Is(err, orgerror.ErrInvalidMode),
+		errors.Is(err, orgerror.ErrReassignTargetInSubtree),
 		errors.Is(err, orgerror.ErrInvalidReassignToDepartmentID):
 		code = http.StatusBadRequest
 		resp = ErrorResponse{
