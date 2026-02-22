@@ -9,6 +9,7 @@ import (
 	orgerror "orgstructure/internal/errors"
 	orgserver "orgstructure/internal/server"
 	"orgstructure/internal/server/middleware"
+	"orgstructure/internal/usecase"
 	"strconv"
 	"strings"
 )
@@ -25,7 +26,7 @@ func NewDepartmentHandler(svc DepartmentService, srv *orgserver.Server) *Departm
 }
 
 func isMode(str string) bool {
-	return str == CascadeMode || str == ReassignMode
+	return str == usecase.CascadeMode || str == usecase.ReassignMode
 }
 
 // HandleCreateDepartment ...
@@ -78,7 +79,7 @@ func (h *DepartmentHandler) HandleCreateDepartment() http.HandlerFunc {
 
 // HandleGetDepartment ...
 func (h *DepartmentHandler) HandleGetDepartment() http.HandlerFunc {
-	const op = "EmployeeHandler.HandleGetDepartment"
+	const op = "DepartmentHandler.HandleGetDepartment"
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		log := h.server.Logger.With(
@@ -107,6 +108,7 @@ func (h *DepartmentHandler) HandleGetDepartment() http.HandlerFunc {
 		}
 		if depth < 0 {
 			h.server.Error(w, r, op, orgerror.ErrInvalidDepth)
+			return
 		}
 
 		includeEmployees := true // default
@@ -133,7 +135,7 @@ func (h *DepartmentHandler) HandleGetDepartment() http.HandlerFunc {
 
 // HandleUpdateDepartment ...
 func (h *DepartmentHandler) HandleUpdateDepartment() http.HandlerFunc {
-	const op = "EmployeeHandler.HandleUpdateDepartment"
+	const op = "DepartmentHandler.HandleUpdateDepartment"
 
 	type request struct {
 		DepartmentName *string `json:"name"`
@@ -182,7 +184,7 @@ func (h *DepartmentHandler) HandleUpdateDepartment() http.HandlerFunc {
 
 // HandleDelDepartment ...
 func (h *DepartmentHandler) HandleDelDepartment() http.HandlerFunc {
-	const op = "EmployeeHandler.HandleDelDepartment"
+	const op = "DepartmentHandler.HandleDelDepartment"
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		log := h.server.Logger.With(
@@ -218,7 +220,7 @@ func (h *DepartmentHandler) HandleDelDepartment() http.HandlerFunc {
 			reassignToDepartmentIDPtr = &reassignToDepartmentIDVal
 		}
 
-		if mode == ReassignMode && reassignToDepartmentIDPtr == nil {
+		if mode == usecase.ReassignMode && reassignToDepartmentIDPtr == nil {
 			h.server.Error(w, r, op, orgerror.ErrInvalidReassignToDepartmentID)
 			return
 		}

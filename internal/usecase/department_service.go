@@ -8,6 +8,17 @@ import (
 	"strings"
 )
 
+var (
+	// --- Режимы удаления подразделений ---
+
+	// CascadeMode режим, при котором удаляется целевое подразделение вместе с детьми и сотрудниками.
+	CascadeMode = "cascade"
+
+	// ReassignMode удаляет подразделение, а сотрудников переводит в другой отдел.
+	// При этом режиме обязательно нужно указывать, куда перевести сотрудников.
+	ReassignMode = "reassign"
+)
+
 // DepartmentService ...
 type DepartmentService struct {
 	deptRepo DepartmentRepository
@@ -65,9 +76,6 @@ func (s *DepartmentService) GetDepartment(ctx context.Context, depth int, includ
 	if err != nil {
 		return nil, err
 	}
-	if dept == nil {
-		return nil, orgerror.ErrDepartmentNotFound
-	}
 
 	return s.buildTree(ctx, dept, depth, includeEmployees)
 }
@@ -121,9 +129,6 @@ func (s *DepartmentService) UpdateDepartment(ctx context.Context, id uint, name 
 	dept, err := s.deptRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
-	}
-	if dept == nil {
-		return nil, orgerror.ErrDepartmentNotFound
 	}
 
 	if parentID != nil {

@@ -5,7 +5,6 @@ import (
 	"context"
 	orgerror "orgstructure/internal/errors"
 	"orgstructure/internal/model"
-	"orgstructure/internal/server/handler"
 	"orgstructure/internal/usecase"
 	repoMocks "orgstructure/mocks/repository"
 	"testing"
@@ -327,7 +326,7 @@ func TestDepartmentUsecase_DelDepartment_Success_Cascade(t *testing.T) {
 		On("DeleteByIDs", ctx, []uint{backend.ID, offchain.ID}).
 		Return(nil)
 
-	err := s.DelDepartment(ctx, backend.ID, handler.CascadeMode, nil)
+	err := s.DelDepartment(ctx, backend.ID, usecase.CascadeMode, nil)
 
 	require.NoError(t, err)
 }
@@ -342,7 +341,7 @@ func TestDepartmentUsecase_DelDepartment_NotFound(t *testing.T) {
 		On("Exists", ctx, uint(99)).
 		Return(false, nil)
 
-	err := s.DelDepartment(ctx, 99, handler.CascadeMode, nil)
+	err := s.DelDepartment(ctx, 99, usecase.CascadeMode, nil)
 
 	require.ErrorIs(t, err, orgerror.ErrDepartmentNotFound)
 }
@@ -372,7 +371,7 @@ func TestDepartmentUsecase_DelDepartment_Reassign_Success(t *testing.T) {
 		On("DeleteByIDs", ctx, subtreeIDs).
 		Return(nil)
 
-	err := s.DelDepartment(ctx, backend.ID, handler.ReassignMode, &developers.ID)
+	err := s.DelDepartment(ctx, backend.ID, usecase.ReassignMode, &developers.ID)
 
 	require.NoError(t, err)
 }
@@ -397,7 +396,7 @@ func TestDepartmentUsecase_DelDepartment_Reassign_TargetInSubtree(t *testing.T) 
 		Return(true, nil)
 
 	// Пытаемся reassign в offchain, который сам входит в удаляемое поддерево
-	err := s.DelDepartment(ctx, backend.ID, handler.ReassignMode, &offchain.ID)
+	err := s.DelDepartment(ctx, backend.ID, usecase.ReassignMode, &offchain.ID)
 
 	assert.Error(t, err)
 }
