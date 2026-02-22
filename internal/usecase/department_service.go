@@ -5,7 +5,6 @@ import (
 	"context"
 	orgerror "orgstructure/internal/errors"
 	"orgstructure/internal/model"
-	"strings"
 )
 
 const (
@@ -31,11 +30,6 @@ func NewDepartmentService(repo DepartmentRepository) *DepartmentService {
 
 // CreateDepartment ...
 func (s *DepartmentService) CreateDepartment(ctx context.Context, name string, parentID *uint) (*model.Department, error) {
-	name = strings.TrimSpace(name)
-	if name == "" {
-		return nil, orgerror.ErrInvalidDepartmentName
-	}
-
 	if parentID != nil {
 		exists, err := s.deptRepo.Exists(ctx, *parentID)
 		if err != nil {
@@ -158,12 +152,7 @@ func (s *DepartmentService) UpdateDepartment(ctx context.Context, id uint, name 
 	}
 
 	if name != nil {
-		trimmed := strings.TrimSpace(*name)
-		if trimmed == "" {
-			return nil, orgerror.ErrInvalidDepartmentName
-		}
-
-		duplicate, err := s.deptRepo.ExistsName(ctx, trimmed, dept.ParentID, &id)
+		duplicate, err := s.deptRepo.ExistsName(ctx, *name, dept.ParentID, &id)
 		if err != nil {
 			return nil, err
 		}
@@ -171,7 +160,7 @@ func (s *DepartmentService) UpdateDepartment(ctx context.Context, id uint, name 
 			return nil, orgerror.ErrDuplicateName
 		}
 
-		dept.Name = trimmed
+		dept.Name = *name
 	}
 
 	if err := s.deptRepo.Update(ctx, dept); err != nil {

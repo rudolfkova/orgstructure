@@ -11,7 +11,9 @@ import (
 	orgerror "orgstructure/internal/errors"
 	orgserver "orgstructure/internal/server"
 	"orgstructure/internal/server/middleware"
+	"orgstructure/internal/validation"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -55,12 +57,14 @@ func (h *EmployeeHandler) HandleCreateEmployeeInDepartment() http.HandlerFunc {
 			return
 		}
 
-		if err := orgserver.ValidateFullName(req.Name); err != nil {
-			h.server.Error(w, r, op, err)
+		req.Name = strings.TrimSpace(req.Name)
+		if err := validation.ValidateStr(req.Name, 200); err != nil {
+			h.server.Error(w, r, op, orgerror.ErrInvalidFullName)
 			return
 		}
-		if err := orgserver.ValidatePos(req.Position); err != nil {
-			h.server.Error(w, r, op, err)
+		req.Position = strings.TrimSpace(req.Position)
+		if err := validation.ValidateStr(req.Position, 200); err != nil {
+			h.server.Error(w, r, op, orgerror.ErrInvalidPosition)
 			return
 		}
 

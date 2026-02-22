@@ -45,30 +45,6 @@ func (s *Server) Respond(w http.ResponseWriter, r *http.Request, code int, data 
 	}
 }
 
-// ValidateFullName ...
-func ValidateFullName(name string) error {
-	if len(name) <= 200 && len(name) >= 1 {
-		return nil
-	}
-	return orgerror.ErrInvalidFullName
-}
-
-// ValidateDeptName ...
-func ValidateDeptName(name string) error {
-	if len(name) <= 200 && len(name) >= 1 {
-		return nil
-	}
-	return orgerror.ErrInvalidDepartmentName
-}
-
-// ValidatePos ...
-func ValidatePos(name string) error {
-	if len(name) <= 200 && len(name) >= 1 {
-		return nil
-	}
-	return orgerror.ErrInvalidPosition
-}
-
 // Error ...
 func (s *Server) Error(w http.ResponseWriter, r *http.Request, op string, err error) {
 	var resp ErrorResponse
