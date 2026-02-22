@@ -1,38 +1,46 @@
 -- +goose Up
 
 CREATE TABLE departments (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(200) NOT NULL CHECK (trim(name) <> ''),
-    parent_id INTEGER NULL,
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    parent_id BIGINT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
 
-    CONSTRAINT fk_department_parent
+    CONSTRAINT departments_parent_fk
         FOREIGN KEY (parent_id)
         REFERENCES departments(id)
-        ON UPDATE CASCADE
-        ON DELETE SET NULL
+        ON DELETE CASCADE
 );
 
-CREATE INDEX idx_departments_parent_id ON departments(parent_id);
+CREATE UNIQUE INDEX departments_root_name_unique
+ON departments (name)
+WHERE parent_id IS NULL;
+
+CREATE UNIQUE INDEX departments_parent_name_unique
+ON departments (parent_id, name)
+WHERE parent_id IS NOT NULL;
 
 
 
 CREATE TABLE employees (
-    id SERIAL PRIMARY KEY,
-    department_id INTEGER NOT NULL,
-    full_name VARCHAR(200) NOT NULL CHECK (trim(full_name) <> ''),
-    position VARCHAR(200) NOT NULL CHECK (trim(position) <> ''),
+    id BIGSERIAL PRIMARY KEY,
+    department_id BIGINT NOT NULL,
+    full_name VARCHAR(200) NOT NULL,
+    position VARCHAR(200) NOT NULL,
     hired_at DATE NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
 
-    CONSTRAINT fk_employee_department
+    CONSTRAINT employees_department_fk
         FOREIGN KEY (department_id)
         REFERENCES departments(id)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT
+        ON DELETE CASCADE
 );
 
-CREATE INDEX idx_employees_department_id ON employees(department_id);
+CREATE INDEX employees_department_idx
+ON employees (department_id);
+
+CREATE INDEX employees_created_at_idx
+ON employees (created_at);
 
 
 
