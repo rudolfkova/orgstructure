@@ -55,6 +55,15 @@ func (h *EmployeeHandler) HandleCreateEmployeeInDepartment() http.HandlerFunc {
 			return
 		}
 
+		if err := orgserver.ValidateFullName(req.Name); err != nil {
+			h.server.Error(w, r, op, err)
+			return
+		}
+		if err := orgserver.ValidatePos(req.Position); err != nil {
+			h.server.Error(w, r, op, err)
+			return
+		}
+
 		ctx := r.Context()
 
 		emp, err := h.service.CreateEmployeeInDepartment(ctx, uint(id), req.Name, req.Position, req.HiredAt)

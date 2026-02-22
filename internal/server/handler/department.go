@@ -50,6 +50,11 @@ func (h *DepartmentHandler) HandleCreateDepartment() http.HandlerFunc {
 			return
 		}
 
+		if err := orgserver.ValidateDeptName(req.DepartmentName); err != nil {
+			h.server.Error(w, r, op, err)
+			return
+		}
+
 		if strings.TrimSpace(req.DepartmentName) == "" {
 			h.server.Error(w, r, op, orgerror.ErrInvalidDepartmentName)
 			return
@@ -156,6 +161,11 @@ func (h *DepartmentHandler) HandleUpdateDepartment() http.HandlerFunc {
 		}
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			h.server.Error(w, r, op, err)
+			return
+		}
+
+		if err := orgserver.ValidateDeptName(*req.DepartmentName); err != nil {
 			h.server.Error(w, r, op, err)
 			return
 		}
