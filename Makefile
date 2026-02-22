@@ -18,8 +18,8 @@ gofmt:
 
 .PHONY: mock
 mock:
-	mockery --name=DepartmentRepository --dir=./internal/repository --output=./mocks/repository --outpkg=mocks
-	mockery --name=EmployeeRepository --dir=./internal/repository --output=./mocks/repository --outpkg=mocks
+	mockery --name=DepartmentRepository --dir=./internal/usecase --output=./mocks/repository --outpkg=mocks
+	mockery --name=EmployeeRepository --dir=./internal/usecase --output=./mocks/repository --outpkg=mocks
 
 .PHONY: test
 test:

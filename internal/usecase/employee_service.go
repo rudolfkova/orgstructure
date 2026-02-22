@@ -5,19 +5,18 @@ import (
 	"context"
 	orgerror "orgstructure/internal/errors"
 	"orgstructure/internal/model"
-	"orgstructure/internal/repository"
 	"strings"
 	"time"
 )
 
 // EmployeeService ...
 type EmployeeService struct {
-	empRepo  repository.EmployeeRepository
-	deptRepo repository.DepartmentRepository
+	empRepo  EmployeeRepository
+	deptRepo DepartmentRepository
 }
 
 // NewEmployeeService ...
-func NewEmployeeService(empRepo repository.EmployeeRepository, deptRepo repository.DepartmentRepository) *EmployeeService {
+func NewEmployeeService(empRepo EmployeeRepository, deptRepo DepartmentRepository) *EmployeeService {
 	return &EmployeeService{empRepo: empRepo, deptRepo: deptRepo}
 }
 

@@ -28,5 +28,13 @@ func ParseConfig() (Config, error) {
 		return Config{}, fmt.Errorf("parse env variables to config: %w", err)
 	}
 
+	if c.BindAddr == "" {
+		return Config{}, errors.New("var BIND_ADDRESS is required")
+	}
+
+	if c.DatabaseURL == "" {
+		return Config{}, errors.New("var POSTGRES_DSN is required")
+	}
+
 	return c, nil
 }

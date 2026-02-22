@@ -6,17 +6,16 @@ import (
 	"fmt"
 	orgerror "orgstructure/internal/errors"
 	"orgstructure/internal/model"
-	"orgstructure/internal/repository"
 	"strings"
 )
 
 // DepartmentService ...
 type DepartmentService struct {
-	deptRepo repository.DepartmentRepository
+	deptRepo DepartmentRepository
 }
 
 // NewDepartmentService ...
-func NewDepartmentService(repo repository.DepartmentRepository) *DepartmentService {
+func NewDepartmentService(repo DepartmentRepository) *DepartmentService {
 	return &DepartmentService{deptRepo: repo}
 }
 

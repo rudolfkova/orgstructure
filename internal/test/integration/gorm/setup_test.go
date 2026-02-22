@@ -12,8 +12,8 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
 
-	gormdb "orgstructure/internal/infrastructure/gorm"
-	gormrepo "orgstructure/internal/infrastructure/gorm/repository"
+	gormdb "orgstructure/internal/repository/gorm"
+	gormrepo "orgstructure/internal/repository/gorm/repository"
 	orgserver "orgstructure/internal/server"
 	"orgstructure/internal/server/handler"
 	"orgstructure/internal/server/middleware"

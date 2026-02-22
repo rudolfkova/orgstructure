@@ -1,4 +1,5 @@
-// Package handler ...
+// Package handler транспортный слой. Обрабатывает запрос, передаёт готовые валидированные данные в service.
+// Также обрабатывает ошибки, подготавливает ответ пользователю.
 package handler
 
 import (
@@ -8,24 +9,23 @@ import (
 	orgerror "orgstructure/internal/errors"
 	orgserver "orgstructure/internal/server"
 	"orgstructure/internal/server/middleware"
-	"orgstructure/internal/service"
 	"strconv"
 	"strings"
 )
 
 // DepartmentHandler ...
 type DepartmentHandler struct {
-	service service.DepartmentService
+	service DepartmentService
 	server  *orgserver.Server
 }
 
 // NewDepartmentHandler ...
-func NewDepartmentHandler(svc service.DepartmentService, srv *orgserver.Server) *DepartmentHandler {
+func NewDepartmentHandler(svc DepartmentService, srv *orgserver.Server) *DepartmentHandler {
 	return &DepartmentHandler{service: svc, server: srv}
 }
 
 func isMode(str string) bool {
-	return str == service.CascadeMode || str == service.ReassignMode
+	return str == CascadeMode || str == ReassignMode
 }
 
 // HandleCreateDepartment ...
@@ -218,7 +218,7 @@ func (h *DepartmentHandler) HandleDelDepartment() http.HandlerFunc {
 			reassignToDepartmentIDPtr = &reassignToDepartmentIDVal
 		}
 
-		if mode == service.ReassignMode && reassignToDepartmentIDPtr == nil {
+		if mode == ReassignMode && reassignToDepartmentIDPtr == nil {
 			h.server.Error(w, r, op, orgerror.ErrInvalidReassignToDepartmentID)
 			return
 		}

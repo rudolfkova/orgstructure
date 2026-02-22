@@ -1,24 +1,26 @@
-// Package handler ...
+// Package handler транспортный слой. Обрабатывает запрос, передаёт готовые валидированные данные в service.
+// Также обрабатывает ошибки, подготавливает ответ пользователю.
 package handler
+
+// Файл employee_handler.go - эндпоинты для работы с пользователями.
 
 import (
 	"encoding/json"
 	"net/http"
 	orgerror "orgstructure/internal/errors"
 	orgserver "orgstructure/internal/server"
-	"orgstructure/internal/service"
 	"strconv"
 	"time"
 )
 
 // EmployeeHandler ...
 type EmployeeHandler struct {
-	service service.EmployeeService
+	service EmployeeService
 	server  *orgserver.Server
 }
 
 // NewEmployeeHandler ...
-func NewEmployeeHandler(svc service.EmployeeService, srv *orgserver.Server) *EmployeeHandler {
+func NewEmployeeHandler(svc EmployeeService, srv *orgserver.Server) *EmployeeHandler {
 	return &EmployeeHandler{service: svc, server: srv}
 }
 
